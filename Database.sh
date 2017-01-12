@@ -1,4 +1,4 @@
-#!/bin/bash -x
+
 shopt -s extglob
 if [ ! -d dbengine ]
 then 
@@ -197,9 +197,10 @@ do
  read value
 
 var=`cut -f $i -d ' '  ./dbengine/metadata/$1/$2`
-var2=`more ./dbengine/databases/$1/$2 | awk -v x=$value '{ if ($1 == x) print $0;}'`
+
 while true
 do
+var2=`more ./dbengine/databases/$1/$2 | awk -v x=$value '{ if ($1 == x) print $0;}'`
 if [[ $i -eq 1 ]]
  then
 
@@ -212,7 +213,7 @@ if [[ $i -eq 1 ]]
      elif [[ "$var2" != "" ]]
     
      then  echo "primary key already exists try again"
-var2=""
+#var2=""
         read value 
 
          else break
@@ -265,15 +266,14 @@ done
 
 
 
+ echo ${arr[@]} >> ./dbengine/databases/$1/$2
+#printf "%s\n"  >> ./dbengine/databases/$1/$2
 
- printf "%s " "${arr[@]}" >> ./dbengine/databases/$1/$2
-printf "%s\n "  >> ./dbengine/databases/$1/$2
 
-
-select choice in "update another row" "previous menu" "go to main menu"
+select choice in "insert another row" "previous menu" "go to main menu"
 do
 case $REPLY in
-1) update $1 $2
+1) insert $1 $2
 ;;
 2) edittable $1 $2;;
 3) main 
@@ -400,7 +400,7 @@ clear
 printf '\t\t\t\t *---Database Engine---*\t\t\t\t ';
 echo choose from the following 
 
-select choice in "Delete row from table $1" "delete table $1"
+select choice in "Delete row from table $2" "delete table $2"
 do
 case $REPLY in
 1) clear 
@@ -410,13 +410,13 @@ do
 read pk 
 #if  grep $pk ./dbengine/databases/$1/$2>/dev/null 
  
- var2=`more ./dbengine/databases/$2/$1 | awk -v x=$pk '{ if ($1 == x) print $0;}'`
+ var2=`cat ./dbengine/databases/$1/$2 | awk -v x=$pk '{ if ($1 == x) print $0;}'`
 if [[ "$var2" != "" ]]
 
 then 
-sed /$pk/d ./dbengine/databases/$1/$2> temp && mv temp ./dbengine/databases/$1/$2 
+sed /"$var2"/d ./dbengine/databases/$1/$2> temp && mv temp ./dbengine/databases/$1/$2 
 
-sleep 2
+sleep 20
 
 echo row deleted successfully 
 sleep 2
